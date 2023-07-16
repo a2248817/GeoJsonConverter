@@ -1,0 +1,76 @@
+﻿@page "/"
+
+@using GeoJSON.Text;
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Buttons
+@using GeoJSON.Text.Feature;
+@using GeoJSON.Text.Geometry;
+@using Syncfusion.Blazor.Maps;
+@using Syncfusion.Blazor.Inputs;
+
+@inject IWebHostEnvironment _webHostEnvironment
+
+
+<SfButton OnClick="ClickCallback" Content="CreateGrid"></SfButton>
+<SfButton OnClick="DownloadFile" Content="DownloadFile"></SfButton>
+
+<SfMaps @ref=@SfMaps>
+
+    <MapsZoomSettings Enable="true"></MapsZoomSettings>
+    <MapsLayers>
+        <MapsLayer @ref=@MapsLayer
+                   TValue="string"
+                   Visible=true
+                   GeometryType="GeometryType.Normal">
+            <MapsLayerTooltipSettings Visible=true
+                                      ValuePath="Name"
+                                      Format="X: ${x}, Y: ${y}"
+                                      Fill="red">
+                <MapsLayerSelectionSettings Enable="true" Fill="green" EnableMultiSelect=true>
+                    <MapsLayerSelectionBorder Color="White" Width="2"></MapsLayerSelectionBorder>
+                </MapsLayerSelectionSettings>
+            </MapsLayerTooltipSettings>
+        </MapsLayer>
+    </MapsLayers>
+</SfMaps>
+
+<SfNumericTextBox @bind-Value="@X"
+                  Placeholder="X"
+                  Min="1"
+                  Max="50"
+                  TValue="int"></SfNumericTextBox>
+<SfNumericTextBox @bind-Value="@Y"
+                  Placeholder="Y"
+                  Min="1"
+                  Max="50"
+                  TValue="int"></SfNumericTextBox>
+
+<h1>X: @X, Y: @Y</h1>
+
+
+@code {
+    public FeatureCollection? FeatureCollection { get; set; } = null;
+    public string GeoJson { get; set; } = string.Empty;
+
+
+    public int X { get; set; }
+    public int Y { get; set; }
+
+    private SfMaps? SfMaps { get; set; }
+    private MapsLayer<string>? MapsLayer { get; set; }
+
+    public async Task ClickCallback()
+    {
+        MapsLayer.ShapeData = null;
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        FeatureCollection = GeoJsonHelper.CreateGrid(X, Y);
+        var geoJson = GeoJsonHelper.ToGeoJson(FeatureCollection);
+        MapsLayer.ShapeData = FeatureCollection;
+    }
+
+    public async Task DownloadFile()
+    {
+        await GeoJsonHelper.ToGeoJsonFileAsync(FeatureCollection, $"./Data/Test/{X}_{Y}_{Guid.NewGuid()}.json");
+    }
+}
