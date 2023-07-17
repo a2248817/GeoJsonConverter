@@ -11,12 +11,14 @@
 @inject IWebHostEnvironment _webHostEnvironment
 
 
-<SfButton OnClick="ClickCallback" Content="CreateGrid"></SfButton>
+<SfButton OnClick="CreateGrid" Content="CreateGrid"></SfButton>
+<SfButton OnClick="CreateRectangle" Content="CreateRectangle"></SfButton>
 <SfButton OnClick="DownloadFile" Content="DownloadFile"></SfButton>
+<SfButton OnClick="DeleteFiles" Content="DeleteFiles"></SfButton>
 
 <SfMaps @ref=@SfMaps>
-
     <MapsZoomSettings Enable="true"></MapsZoomSettings>
+    <MapsEvents OnItemSelect="@OnItemSelectEvent"></MapsEvents>
     <MapsLayers>
         <MapsLayer @ref=@MapsLayer
                    TValue="string"
@@ -47,6 +49,21 @@
 
 <h1>X: @X, Y: @Y</h1>
 
+<button id="select" @onclick="Select">select</button>
+<button id="unselect" @onclick="Unselect">unselect</button>
+
+
+@if (SelectedPoints is not null)
+{
+    <div>
+        @foreach (var point in SelectedPoints)
+        {
+            <span>Id: @point.Id</span>
+            <span>Type: @point.Geometry.Type</span>
+            <br />
+        }
+    </div>
+}
 
 @code {
     public FeatureCollection? FeatureCollection { get; set; } = null;
@@ -59,18 +76,65 @@
     private SfMaps? SfMaps { get; set; }
     private MapsLayer<string>? MapsLayer { get; set; }
 
-    public async Task ClickCallback()
+    public void CreateGrid()
     {
         MapsLayer.ShapeData = null;
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        FeatureCollection = GeoJsonHelper.CreateGrid(X, Y);
+        FeatureCollection = GeoJsonHelper.CreatePoints(X, Y);
+        var geoJson = GeoJsonHelper.ToGeoJson(FeatureCollection);
+        MapsLayer.ShapeData = FeatureCollection;
+    }
+
+    public void CreateRectangle()
+    {
+        MapsLayer.ShapeData = null;
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        FeatureCollection = new(new List<Feature> { GeoJsonHelper.CreateRectangle(X, Y) });
         var geoJson = GeoJsonHelper.ToGeoJson(FeatureCollection);
         MapsLayer.ShapeData = FeatureCollection;
     }
 
     public async Task DownloadFile()
     {
-        await GeoJsonHelper.ToGeoJsonFileAsync(FeatureCollection, $"./Data/Test/{X}_{Y}_{Guid.NewGuid()}.json");
+        var filePath = $"./Data/Test/{X}_{Y}&{DateTime.Now.ToString("yyyy_MM_dd&HH_mm_ss.FFF&zz")}.json";
+        await GeoJsonHelper.ToGeoJsonFileAsync(FeatureCollection, filePath);
+    }
+
+    public void DeleteFiles()
+    {
+        var path = $"./Data/Test";
+        var directoryInfo = new DirectoryInfo(path);
+        var files = directoryInfo.GetFiles();
+        foreach (var file in files)
+        {
+            file.Delete();
+        }
+    }
+
+    public void Select()
+    {
+        SfMaps.ShapeSelectionAsync(0, "x", "0", true);
+    }
+
+    public void Unselect()
+    {
+        SfMaps.ShapeSelectionAsync(0, "x", "0", false);
+    }
+
+    public List<Feature> SelectedPoints { get; set; } = new();
+    public void OnItemSelectEvent(SelectionEventArgs args)
+    {
+        var guid = args.ShapeData["guid"];
+        var Point = FeatureCollection.Features.Find(f => f.Id == guid);
+        if (SelectedPoints.Contains(Point) == false)
+        {
+            SelectedPoints.Add(Point);
+        }
+        else
+        {
+            SelectedPoints.Remove(Point);
+        }
     }
 }
