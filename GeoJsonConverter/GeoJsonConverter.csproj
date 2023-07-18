@@ -19,4 +19,10 @@
     <ProjectReference Include="..\GeoJsonHelper\GeoJsonHelper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\data\7_4&amp;2023_07_18&amp;16_22_02.126&amp;+08.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 @using GeoJSON.Text;
+@using GeoJsonHelper.Extensions;
 @using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.Buttons
 @using GeoJSON.Text.Feature;
@@ -16,22 +17,16 @@
 <SfButton OnClick="DownloadFile" Content="DownloadFile"></SfButton>
 <SfButton OnClick="DeleteFiles" Content="DeleteFiles"></SfButton>
 
-<SfMaps @ref=@SfMaps>
-    <MapsZoomSettings Enable="true"></MapsZoomSettings>
+<SfMaps @ref=@SfMaps EnablePersistence=false>
     <MapsEvents OnItemSelect="@OnItemSelectEvent"></MapsEvents>
     <MapsLayers>
         <MapsLayer @ref=@MapsLayer
                    TValue="string"
                    Visible=true
                    GeometryType="GeometryType.Normal">
-            <MapsLayerTooltipSettings Visible=true
-                                      ValuePath="Name"
-                                      Format="X: ${x}, Y: ${y}"
-                                      Fill="red">
                 <MapsLayerSelectionSettings Enable="true" Fill="green" EnableMultiSelect=true>
                     <MapsLayerSelectionBorder Color="White" Width="2"></MapsLayerSelectionBorder>
                 </MapsLayerSelectionSettings>
-            </MapsLayerTooltipSettings>
         </MapsLayer>
     </MapsLayers>
 </SfMaps>
@@ -49,8 +44,10 @@
 
 <h1>X: @X, Y: @Y</h1>
 
-<button id="select" @onclick="Select">select</button>
-<button id="unselect" @onclick="Unselect">unselect</button>
+<SfButton Content="CreateLineString" OnClick="CreateLineString"></SfButton>
+<SfButton Content="CreatePolygon" OnClick="CreatePolygon"></SfButton>
+<SfButton Content="PopPoint" OnClick="PopPoint"></SfButton>
+<SfButton Content="Refresh" OnClick="Refresh"></SfButton>
 
 
 @if (SelectedPoints is not null)
@@ -78,28 +75,20 @@
 
     public void CreateGrid()
     {
-        MapsLayer.ShapeData = null;
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
         FeatureCollection = GeoJsonHelper.CreatePoints(X, Y);
-        var geoJson = GeoJsonHelper.ToGeoJson(FeatureCollection);
         MapsLayer.ShapeData = FeatureCollection;
     }
 
     public void CreateRectangle()
     {
-        MapsLayer.ShapeData = null;
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
         FeatureCollection = new(new List<Feature> { GeoJsonHelper.CreateRectangle(X, Y) });
-        var geoJson = GeoJsonHelper.ToGeoJson(FeatureCollection);
         MapsLayer.ShapeData = FeatureCollection;
     }
 
     public async Task DownloadFile()
     {
         var filePath = $"./Data/Test/{X}_{Y}&{DateTime.Now.ToString("yyyy_MM_dd&HH_mm_ss.FFF&zz")}.json";
-        await GeoJsonHelper.ToGeoJsonFileAsync(FeatureCollection, filePath);
+        await GeoJsonHelper.ToGeoJsonFileAsync((FeatureCollection)MapsLayer.ShapeData, filePath);
     }
 
     public void DeleteFiles()
@@ -111,16 +100,6 @@
         {
             file.Delete();
         }
-    }
-
-    public void Select()
-    {
-        SfMaps.ShapeSelectionAsync(0, "x", "0", true);
-    }
-
-    public void Unselect()
-    {
-        SfMaps.ShapeSelectionAsync(0, "x", "0", false);
     }
 
     public List<Feature> SelectedPoints { get; set; } = new();
@@ -136,5 +115,56 @@
         {
             SelectedPoints.Remove(Point);
         }
+    }
+
+    public void CreateLineString()
+    {
+        SelectedPoints.ForEach(p => FeatureCollection.Features.Remove(p));
+        var points = SelectedPoints.Select(f => (Point)f.Geometry);
+        var lineString = GeoJsonHelper.CreateLineStringFromPoints(points).ToFeature();
+        FeatureCollection.Features.Add(lineString);
+
+        MapsLayer.ShapeData = GeoJsonHelper.CreatePoints(0, 0);
+        SfMaps.Refresh();
+        MapsLayer.ShapeData = FeatureCollection;
+        SfMaps.Refresh();
+
+        SelectedPoints.Clear();
+        SelectedPoints.ForEach(async p => await SfMaps.ShapeSelectionAsync(0, "guid", p.Id, false));
+    }
+
+    public void CreatePolygon()
+    {
+        SelectedPoints.ForEach(p => FeatureCollection.Features.Remove(p));
+        var points = SelectedPoints.Select(f => (Point)f.Geometry);
+        var polygon = GeoJsonHelper.CreatePolygonFromPoints(points).ToFeature();
+        FeatureCollection.Features.Add(polygon);
+
+        MapsLayer.ShapeData = GeoJsonHelper.CreatePoints(0, 0);
+        SfMaps.Refresh();
+        MapsLayer.ShapeData = FeatureCollection;
+        SfMaps.Refresh();
+
+        SelectedPoints.Clear();
+        SelectedPoints.ForEach(async p => await SfMaps.ShapeSelectionAsync(0, "guid", p.Id, false));
+
+    }
+
+    public void Refresh()
+    {
+        //MapsLayer<string> mapsLayer = new();
+        //mapsLayer.Visible = true;
+        //mapsLayer.GeometryType = GeometryType.Normal;
+        //mapsLayer.ShapeData = FeatureCollection;
+        //MapsLayer = mapsLayer;
+        //MapsLayer.ShapeData = null;
+        //MapsLayer.ShapeData = FeatureCollection;
+        //SfMaps.Refresh();
+        //StateHasChanged();
+    }
+
+    public void PopPoint()
+    {
+        
     }
 }

@@ -1,29 +1,29 @@
 ﻿using GeoJSON.Text.Feature;
 using GeoJSON.Text.Geometry;
+using GeoJsonHelper.Extensions;
+using System.Drawing;
+using System.Linq;
 using System.Text.Json;
+using Point = GeoJSON.Text.Geometry.Point;
 
 namespace GeoJsonHelper.Utilities;
 
+
+
+
 public class GeoJsonHelper
 {
-    public static Feature CreatePoint(int x, int y)
+    public static Position CreatePosition(int x, int y)
     {
-        var feature = new Feature();
-
         //latitude 緯度 Y, longitude 經度 X 
         var position = new Position(y, x);
+        return position;
+    }
 
-        var point = new Point(position);
-        feature.Geometry = point;
-        feature.Id = $"{Guid.NewGuid()}";
-
-        var properties = new Dictionary<string, object>();
-        properties.Add("guid", feature.Id);
-        properties.Add("x", x);
-        properties.Add("y", y);
-        feature.Properties = properties;
-
-        return feature;
+    public static Point CreatePoint(int x, int y)
+    {
+        var point = CreatePosition(x, y).ToPoint();
+        return point;
     }
     public static FeatureCollection CreatePoints(int x, int y)
     {
@@ -35,7 +35,7 @@ public class GeoJsonHelper
             //先往右建立X方向點
             for (int j = 0; j < x; j++)
             {
-                var feature = GeoJsonHelper.CreatePoint(j, i);
+                var feature = CreatePoint(j, i).ToFeature();
                 result.Features.Add(feature);
             }
         }
@@ -43,45 +43,37 @@ public class GeoJsonHelper
         return result;
     }
 
-    public static Feature CreateLineString(IEnumerable<Feature> points)
+    public static LineString CreateLineStringFromPoints(IEnumerable<Point> points)
     {
-        var feature = new Feature();
-
-        var positions = new List<IPosition>();
-        var guids = new List<string>();
-        foreach (var point in points)
-        {
-            var position = ((Point)point.Geometry).Coordinates;
-            positions.Add(position);
-            guids.Add(point.Id);
-        }
-        //latitude 緯度 Y, longitude 經度 X 
-
+        var positions = points.ToPositions();
         var lineString = new LineString(positions);
-
-        feature.Geometry = lineString;
-        feature.Id = $"{Guid.NewGuid()}";
-
-        var properties = new Dictionary<string, object>();
-        properties.Add("guid", feature.Id);
-        properties.Add("guids", String.Join(" ",guids));
-        feature.Properties = properties;
-
-        return feature;
+        return lineString;
     }
 
+    public static Polygon CreatePolygonFromPoints(IEnumerable<Point> points)
+    {
+        if (points.First().Equals(points.Last()) == false)
+        {
+            points = points.Append(points.First());
+        }
+        var lineString = CreateLineStringFromPoints(points);
+
+        var Polygon = new Polygon(new List<LineString> { lineString });
+        return Polygon;
+    }
     public static Feature CreateRectangle(int x, int y)
     {
         var feature = new Feature();
 
         //latitude 緯度 Y, longitude 經度 X 
-        var positions = new List<IPosition>();
-
-        positions.Add(new Position(0, 0));
-        positions.Add(new Position(0, x));
-        positions.Add(new Position(y, x));
-        positions.Add(new Position(y, 0));
-        positions.Add(new Position(0, 0));
+        var positions = new List<IPosition>
+        {
+            CreatePosition(0, 0),
+            CreatePosition(x, 0),
+            CreatePosition(x, y),
+            CreatePosition(0, y),
+            CreatePosition(0, 0)
+        };
 
         var lineString = new LineString(positions);
 
@@ -90,10 +82,13 @@ public class GeoJsonHelper
         feature.Geometry = rectangle;
         feature.Id = $"{Guid.NewGuid()}";
 
-        var properties = new Dictionary<string, object>();
-        properties.Add("guid", feature.Id);
-        properties.Add("x", x);
-        properties.Add("y", y);
+        var properties = new Dictionary<string, object>
+        {
+            { "guid", feature.Id },
+            { "points", positions.Count }
+        };
+
+
         feature.Properties = properties;
 
         return feature;
