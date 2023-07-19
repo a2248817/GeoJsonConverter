@@ -3,13 +3,11 @@ using GeoJSON.Text.Geometry;
 using GeoJsonHelper.Extensions;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Point = GeoJSON.Text.Geometry.Point;
 
 namespace GeoJsonHelper.Utilities;
-
-
-
 
 public class GeoJsonHelper
 {
@@ -25,9 +23,9 @@ public class GeoJsonHelper
         var point = CreatePosition(x, y).ToPoint();
         return point;
     }
-    public static FeatureCollection CreatePoints(int x, int y)
+    public static List<Point> CreatePoints(int x, int y)
     {
-        var result = new FeatureCollection();
+        var result = new List<Point>();
 
         //再往上建立Y方向點
         for (int i = 0; i < y; i++)
@@ -35,13 +33,14 @@ public class GeoJsonHelper
             //先往右建立X方向點
             for (int j = 0; j < x; j++)
             {
-                var feature = CreatePoint(j, i).ToFeature();
-                result.Features.Add(feature);
+                var feature = CreatePoint(j, i);
+                result.Add(feature);
             }
         }
 
         return result;
     }
+
 
     public static LineString CreateLineStringFromPoints(IEnumerable<Point> points)
     {
@@ -63,8 +62,6 @@ public class GeoJsonHelper
     }
     public static Feature CreateRectangle(int x, int y)
     {
-        var feature = new Feature();
-
         //latitude 緯度 Y, longitude 經度 X 
         var positions = new List<IPosition>
         {
@@ -77,21 +74,11 @@ public class GeoJsonHelper
 
         var lineString = new LineString(positions);
 
-        var rectangle = new Polygon(new List<LineString> { lineString });
+        var rectangle = new Polygon(new List<LineString> { lineString }).ToFeature();
 
-        feature.Geometry = rectangle;
-        feature.Id = $"{Guid.NewGuid()}";
+        rectangle.Properties.Add("points", positions.Count);
 
-        var properties = new Dictionary<string, object>
-        {
-            { "guid", feature.Id },
-            { "points", positions.Count }
-        };
-
-
-        feature.Properties = properties;
-
-        return feature;
+        return rectangle;
     }
 
 
