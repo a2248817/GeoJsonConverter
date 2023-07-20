@@ -11,56 +11,86 @@
 
 @inject IWebHostEnvironment _webHostEnvironment
 
-<div id="gg">
-<SfButton OnClick="CreateGrid" Content="CreateGrid"></SfButton>
-<SfButton OnClick="CreateRectangle" Content="CreateRectangle"></SfButton>
-<SfButton OnClick="DownloadFile" Content="DownloadFile"></SfButton>
-<SfButton OnClick="DeleteFiles" Content="DeleteFiles"></SfButton>
 
-<SfMaps @ref=@SfMaps Height="700">
-    <MapsZoomSettings Enable=true DoubleClickZoom=true></MapsZoomSettings>
-    <MapsEvents OnItemSelect=@OnItemSelectEvent></MapsEvents>
-    <MapsLayers>
-        <MapsLayer @ref=@MapsLayer
-                   TValue="string"
-                   Visible=true
-                   GeometryType="GeometryType.Normal">
-            <MapsLayerSelectionSettings Enable="true" Fill="green" EnableMultiSelect=true>
-                <MapsLayerSelectionBorder Color="White" Width="2"></MapsLayerSelectionBorder>
-            </MapsLayerSelectionSettings>
-        </MapsLayer>
-    </MapsLayers>
-</SfMaps>
-
-<SfNumericTextBox @bind-Value="@X"
-                  Placeholder="X"
-                  Min="1"
-                  Max="50"
-                  TValue="int"></SfNumericTextBox>
-<SfNumericTextBox @bind-Value="@Y"
-                  Placeholder="Y"
-                  Min="1"
-                  Max="50"
-                  TValue="int"></SfNumericTextBox>
-
-<h1>X: @X, Y: @Y</h1>
-
-<SfButton Content="CreatePolygon" OnClick="CreatePolygon"></SfButton>
+<div class="container-fluid">
+    <div class="row">
 
 
-@if (SelectedPoints is not null)
-{
-    <div>
-        @foreach (var point in SelectedPoints)
-        {
-            <span>Id: @point.Id</span>
-            <span>Type: @point.Geometry.Type</span>
-            <br />
-        }
+        <div class="col-10 my-2">
+
+
+            <SfMaps @ref=@SfMaps Height="900">
+                <MapsZoomSettings Enable=true DoubleClickZoom=true></MapsZoomSettings>
+                <MapsEvents OnItemSelect=@OnItemSelectEvent></MapsEvents>
+                <MapsLayers>
+                    <MapsLayer @ref=@MapsLayer
+                               TValue="string"
+                               Visible=true
+                               GeometryType="GeometryType.Normal">
+                        <MapsLayerSelectionSettings Enable="true" Fill="green" EnableMultiSelect=true>
+                            <MapsLayerSelectionBorder Color="White" Width="2"></MapsLayerSelectionBorder>
+                        </MapsLayerSelectionSettings>
+                    </MapsLayer>
+                </MapsLayers>
+            </SfMaps>
+
+        </div>
+
+
+
+        <div class="col-2">
+
+            <div>
+                <SfButton OnClick="CreateGrid" Content="CreateGrid" CssClass="w-100 my-1"></SfButton>
+            </div>
+            <div>
+                <SfButton OnClick="CreateRectangle" Content="CreateRectangle" CssClass="w-100 my-1"></SfButton>
+            </div>
+            <div>
+                <SfButton Content="CreatePolygon" OnClick="CreatePolygon" CssClass="w-100 my-1"></SfButton>
+            </div>
+            <div>
+                <SfButton OnClick="DownloadFile" Content="DownloadFile" CssClass="w-100 my-1"></SfButton>
+            </div>
+            <div>
+                <SfButton OnClick="DeleteFiles" Content="DeleteFiles" CssClass="w-100 my-1"></SfButton>
+            </div>
+
+            <SfNumericTextBox @bind-Value="@X"
+                              Placeholder="X"
+                              Min="1"
+                              Max="50"
+                              TValue="int"></SfNumericTextBox>
+            <SfNumericTextBox @bind-Value="@Y"
+                              Placeholder="Y"
+                              Min="1"
+                              Max="50"
+                              TValue="int"></SfNumericTextBox>
+
+            <h1>X: @X, Y: @Y</h1>
+
+            <h1>
+                Selected Points
+            </h1>
+
+            @if (SelectedPoints is not null)
+            {
+                <div>
+                    @foreach (var point in SelectedPoints)
+                    {
+                        <span>Id: @point.Id</span>
+                        <br />
+                        <span>Type: @point.Geometry.Type</span>
+                    }
+                </div>
+            }
+
+        </div>
+
     </div>
-}
 
 </div>
+
 
 @code {
     public FeatureCollection? FeatureCollection { get; set; } = null;

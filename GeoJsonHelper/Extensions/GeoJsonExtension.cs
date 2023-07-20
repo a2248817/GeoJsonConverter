@@ -83,6 +83,7 @@ public static class GeoJsonExtension
         result.Features = featureCollection.Features.Append(feature).ToList();
 
         return result;
+
     }
 
 }
