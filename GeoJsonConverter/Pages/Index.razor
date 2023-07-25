@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 @using GeoJSON.Text;
+@using GeoJsonConverter.Model;
 @using GeoJsonHelper.Extensions;
 @using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.Buttons
@@ -8,19 +9,30 @@
 @using GeoJSON.Text.Geometry;
 @using Syncfusion.Blazor.Maps;
 @using Syncfusion.Blazor.Inputs;
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Lists
 
 @inject IWebHostEnvironment _webHostEnvironment
 
 
 <div class="container-fluid">
     <div class="row">
+        <div>
+
+            <SfAppBar ColorMode="AppBarColor.Primary">
+                <span class="regular">Blazor AppBar</span>
+                <AppBarSpacer></AppBarSpacer>
+                <span class="regular">Blazor AppBar</span>
+            </SfAppBar>
+        </div>
+    </div>
+    <div class="row">
 
 
-        <div class="col-10 my-2">
+        <div class="col-10 my-2" id="SfMaps">
 
 
-            <SfMaps @ref=@SfMaps Height="900">
-                <MapsZoomSettings Enable=true DoubleClickZoom=true></MapsZoomSettings>
+            <SfMaps @ref=@SfMaps Height="800">
                 <MapsEvents OnItemSelect=@OnItemSelectEvent></MapsEvents>
                 <MapsLayers>
                     <MapsLayer @ref=@MapsLayer
@@ -37,51 +49,65 @@
         </div>
 
 
-
         <div class="col-2">
 
             <div>
-                <SfButton OnClick="CreateGrid" Content="CreateGrid" CssClass="w-100 my-1"></SfButton>
+                <SfButton OnClick="CreateGrid"
+                          Content="CreateGrid"
+                          CssClass="w-100 my-1"></SfButton>
             </div>
             <div>
-                <SfButton OnClick="CreateRectangle" Content="CreateRectangle" CssClass="w-100 my-1"></SfButton>
+                <SfButton OnClick="CreateRectangle"
+                          Content="CreateRectangle"
+                          CssClass="w-100 my-1"></SfButton>
             </div>
             <div>
-                <SfButton Content="CreatePolygon" OnClick="CreatePolygon" CssClass="w-100 my-1"></SfButton>
+                <SfButton Content="CreatePolygon"
+                          OnClick="CreatePolygon"
+                          CssClass="w-100 my-1"></SfButton>
             </div>
             <div>
-                <SfButton OnClick="DownloadFile" Content="DownloadFile" CssClass="w-100 my-1"></SfButton>
+                <SfButton OnClick="DownloadFile"
+                          Content="DownloadFile"
+                          CssClass="w-100 my-1"></SfButton>
             </div>
             <div>
-                <SfButton OnClick="DeleteFiles" Content="DeleteFiles" CssClass="w-100 my-1"></SfButton>
+                <SfButton OnClick="DeleteFiles"
+                          Content="DeleteFiles"
+                          CssClass="w-100 my-1"></SfButton>
+            </div>
+            <div>
+                <SfButton OnClick="ResetSelection"
+                          Content="ResetSelection"
+                          CssClass="w-100 my-1"></SfButton>
             </div>
 
             <SfNumericTextBox @bind-Value="@X"
                               Placeholder="X"
                               Min="1"
-                              Max="50"
+                              Max="20"
                               TValue="int"></SfNumericTextBox>
             <SfNumericTextBox @bind-Value="@Y"
                               Placeholder="Y"
                               Min="1"
-                              Max="50"
+                              Max="20"
                               TValue="int"></SfNumericTextBox>
 
             <h1>X: @X, Y: @Y</h1>
 
-            <h1>
+            <b>
                 Selected Points
-            </h1>
+            </b>
 
             @if (SelectedPoints is not null)
             {
                 <div>
-                    @foreach (var point in SelectedPoints)
-                    {
-                        <span>Id: @point.Id</span>
-                        <br />
-                        <span>Type: @point.Geometry.Type</span>
-                    }
+                    <SfListView DataSource="@SelectedPointModels">
+                        <ListViewFieldSettings TValue="SelectedPointModel"
+                                               Id="Id"
+                                               GroupBy="Category"
+                                               Text="Name"></ListViewFieldSettings>
+                    </SfListView>
                 </div>
             }
 
@@ -92,8 +118,18 @@
 </div>
 
 
+
+<style>
+    .e-listview .e-list-group-item {
+        color: #4FE3F8;
+        font-size: 1rem;
+        background-color: #F6C33D;
+        text-align: center
+    }
+</style>
+
 @code {
-    public FeatureCollection? FeatureCollection { get; set; } = null;
+    public FeatureCollection FeatureCollection { get; set; } = new();
     public string GeoJson { get; set; } = string.Empty;
 
 
@@ -103,16 +139,20 @@
     private SfMaps? SfMaps { get; set; }
     private MapsLayer<string>? MapsLayer { get; set; }
 
+    public List<Feature> SelectedPoints { get; set; } = new();
+    public List<SelectedPointModel> SelectedPointModels { get; set; } = new();
 
 
     public void CreateGrid()
     {
+        ResetSelection();
         FeatureCollection = GeoJsonHelper.CreatePoints(X, Y).ToFeatures().ToFeatureCollection();
         MapsLayer.ShapeData = FeatureCollection;
     }
 
     public void CreateRectangle()
     {
+        ResetSelection();
         FeatureCollection = GeoJsonHelper.CreateRectangle(X, Y).ToFeatureCollection();
         MapsLayer.ShapeData = FeatureCollection;
     }
@@ -134,7 +174,6 @@
         }
     }
 
-    public List<Feature> SelectedPoints { get; set; } = new();
     public void OnItemSelectEvent(SelectionEventArgs args)
     {
         var guid = args.ShapeData["guid"];
@@ -142,6 +181,11 @@
         if (SelectedPoints.Contains(Point) == false)
         {
             SelectedPoints.Add(Point);
+
+            var selectedPoint = new SelectedPointModel(Point);
+            selectedPoint.Id = SelectedPointModels.Count;
+
+            SelectedPointModels.Add(selectedPoint);
         }
         else
         {
@@ -158,8 +202,14 @@
         FeatureCollection = FeatureCollection.AddFeature(polygon);
         MapsLayer.ShapeData = FeatureCollection;
 
+        ResetSelection();
+
+    }
+
+    public void ResetSelection()
+    {
         SelectedPoints.ForEach(async p => await SfMaps.ShapeSelectionAsync(0, "guid", p.Id, false));
         SelectedPoints.Clear();
-
+        SelectedPointModels.Clear();
     }
 }

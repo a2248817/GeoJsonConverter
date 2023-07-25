@@ -76,7 +76,7 @@ public static class GeoJsonExtension
     /// <param name="features"></param>
     /// <param name="feature"></param>
     /// <returns></returns>
-    public static FeatureCollection? AddFeature(this FeatureCollection featureCollection, Feature feature)
+    public static FeatureCollection AddFeature(this FeatureCollection featureCollection, Feature feature)
     {
         var result = new FeatureCollection();
 
