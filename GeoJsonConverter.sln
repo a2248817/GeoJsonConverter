@@ -5,7 +5,11 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoJsonConverter", "GeoJsonConverter\GeoJsonConverter.csproj", "{5BFD590D-A765-4AB5-BCDD-07C43EE9EB4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoJsonHelper", "GeoJsonHelper\GeoJsonHelper.csproj", "{E2BA854C-E306-4930-A63B-0AE554448984}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoJsonHelper", "GeoJsonHelper\GeoJsonHelper.csproj", "{E2BA854C-E306-4930-A63B-0AE554448984}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SvgSharp", "SvgHelper\SvgSharp.csproj", "{559B400A-2863-4D50-80A6-68BCA57508B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SvgSharp.Blazor", "SvgSharp.Blazor\SvgSharp.Blazor.csproj", "{DC5CD9FD-EDB6-438C-83CD-661151AAD7E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{E2BA854C-E306-4930-A63B-0AE554448984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2BA854C-E306-4930-A63B-0AE554448984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2BA854C-E306-4930-A63B-0AE554448984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559B400A-2863-4D50-80A6-68BCA57508B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559B400A-2863-4D50-80A6-68BCA57508B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559B400A-2863-4D50-80A6-68BCA57508B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559B400A-2863-4D50-80A6-68BCA57508B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC5CD9FD-EDB6-438C-83CD-661151AAD7E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC5CD9FD-EDB6-438C-83CD-661151AAD7E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC5CD9FD-EDB6-438C-83CD-661151AAD7E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC5CD9FD-EDB6-438C-83CD-661151AAD7E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

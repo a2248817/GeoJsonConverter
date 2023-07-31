@@ -1,0 +1,180 @@
+﻿@page "/TestRoute/BlazorCanvas"
+@using GeoJsonHelper.Extensions;
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Lists
+@using Syncfusion.Blazor.Navigations
+
+
+@using MySvg = SvgSharp.Svg;
+@using Rect = SvgSharp.Rect;
+
+<div class="container-fluid h-100">
+    <div class="row h-100 ">
+
+        <div class="col-2 p-0">
+            <div class="h-100 d-flex flex-column border rounded">
+
+                <div class="border-bottom rounded">
+
+                    <div class="container">
+                        <div class="row my-1">
+                            <h3 class="text-center">
+                                Svg Dimensions
+                            </h3>
+                        </div>
+
+                        <div class="row my-1">
+                            <div class="col-3">
+                                <label for="Width" class="h-100 d-flex align-items-center">Width</label>
+                            </div>
+                            <div class="col-9">
+                                <SfNumericTextBox ID="Width"
+                                                  TValue="double"
+                                @bind-Value=@Width
+                                                  Max="100"
+                                                  Min="10"></SfNumericTextBox>
+                            </div>
+                        </div>
+                        <div class="row my-1">
+                            <div class="col-3">
+                                <label for="ColumnCount" class="h-100 d-flex align-items-center">Height</label>
+                            </div>
+                            <div class="col-9">
+                                <SfNumericTextBox ID="Height"
+                                                  TValue="double"
+                                @bind-Value=@Height
+                                                  Max="100"
+                                                  Min="10"></SfNumericTextBox>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col">
+                                <SfButton Content="Create"
+                                          OnClick="@(()=> _svgRef.CreateGrid(RowCount, ColumnCount))"
+                                          CssClass="w-100"></SfButton>
+                            </div>
+                            <div class="col">
+                                <SfButton Content="Reset"
+                                          OnClick="@(_svgRef.ResetGrid)"
+                                          CssClass="w-100"></SfButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-bottom rounded">
+                    <div class="container">
+                        <div class="row my-1">
+                            <h3 class="text-center">
+                                Grid Dimensions
+                            </h3>
+                        </div>
+
+                        <div class="row my-1">
+                            <div class="col-3">
+                                <label for="RowCount" class="h-100 d-flex align-items-center">Rows</label>
+                            </div>
+                            <div class="col-9">
+                                <SfNumericTextBox ID="RowCount"
+                                                  TValue="int"
+                                @bind-Value=@RowCount
+                                                  Max="50"
+                                                  Min="1"></SfNumericTextBox>
+                            </div>
+                        </div>
+                        <div class="row my-1">
+                            <div class="col-3">
+                                <label for="ColumnCount" class="h-100 d-flex align-items-center">Columns</label>
+                            </div>
+                            <div class="col-9">
+                                <SfNumericTextBox ID="ColumnCount"
+                                                  TValue="int"
+                                @bind-Value=@ColumnCount
+                                                  Max="50"
+                                                  Min="1"></SfNumericTextBox>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col">
+                                <SfButton Content="Create"
+                                          OnClick="@(()=> _svgRef.CreateGrid(RowCount, ColumnCount))"
+                                          CssClass="w-100"></SfButton>
+                            </div>
+                            <div class="col">
+                                <SfButton Content="Reset"
+                                          OnClick="@(_svgRef.ResetGrid)"
+                                          CssClass="w-100"></SfButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-bottom rounded">
+                    <SfButton OnClick="@Generate" Content="Generate">Generate</SfButton>
+                </div>
+                <div class="border-bottom rounded">
+                    <SfButton OnClick="@Generate" Content="Generate">Generate</SfButton>
+                </div>
+                <div class="border-bottom rounded">
+                    <SfButton OnClick="@Generate" Content="Generate">Generate</SfButton>
+                </div>
+                <div class="border-bottom rounded">
+                    <SfButton OnClick="@Generate" Content="Generate">Generate</SfButton>
+                </div>
+                <div class="border-bottom rounded">
+                    <SfButton OnClick="@AddRect" Content="AddRect">AddRect</SfButton>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-8 p-0">
+            <Svg @ref="@_svgRef"
+                 Width="@Width"
+                 Height="@Height"
+                 RowCount="@RowCount"
+                 ColumnCount="@ColumnCount">
+            </Svg>
+        </div>
+
+        <div class="col-2 p-0">
+            <div class=" h-100 border border-left-0 rounded">
+                <SfListView DataSource="@_svgRef.SelectedCircles">
+                    <ListViewFieldSettings TValue="Components.Circle" Id="Guid" Text="Text"></ListViewFieldSettings>
+                </SfListView>
+            </div>
+        </div>
+
+    </div>
+</div>
+@code {
+
+    public int RowCount { get; set; } = 1;
+    public int ColumnCount { get; set; } = 1;
+
+    public double Width { get; set; } = 1;
+    public double Height { get; set; } = 1;
+
+    public int Padding { get; set; } = 1;
+
+    private Components.Svg _svgRef = new();
+
+    private SvgSharp.Svg SsSvg = new();
+
+
+    void Generate()
+    {
+        Console.WriteLine($"RowCount: {RowCount}, ColumnCount: {ColumnCount}");
+    }
+
+    void AddRect()
+    {
+        var rect = new Rect();
+        rect.SetAttribute("width", $"{Random.Shared.Next(5)}%");
+        rect.SetAttribute("height", $"{Random.Shared.Next(5)}%");
+        rect.SetAttribute("fill", $"#{Random.Shared.Next(9)}{Random.Shared.Next(9)}{Random.Shared.Next(9)}");
+        rect.SetAttribute("x", $"{Random.Shared.NextDouble() * 100}%");
+        rect.SetAttribute("y", $"{Random.Shared.NextDouble() * 100}%");
+        rect.SetAttribute("onclick", "Generate");
+        SsSvg.AddElement(rect);
+    }
+}
+

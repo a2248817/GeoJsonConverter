@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeoJsonHelper\GeoJsonHelper.csproj" />
+    <ProjectReference Include="..\SvgHelper\SvgSharp.csproj" />
+    <ProjectReference Include="..\SvgSharp.Blazor\SvgSharp.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

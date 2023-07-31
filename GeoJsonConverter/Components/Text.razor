@@ -1,0 +1,95 @@
+﻿@using System.ComponentModel.DataAnnotations;
+<text x="@X"
+      y="@Y"
+      font-size="@FontSize"
+      fill="@Color"
+      guid="@Guid"
+      dominant-baseline="@_dominantBaseline"
+      text-anchor="@_textAnchor">
+        @Content
+</text>
+
+@code {
+    public enum VerticalPositions
+    {
+        Top,
+        Middle,
+        Bottom
+    }
+
+    public enum HorizontalPositions
+    {
+        Left,
+        Middle,
+        Right
+    }
+}
+
+@code {
+
+
+    [Parameter]
+    public string X { get; set; } = "0";
+    [Parameter]
+    public string Y { get; set; } = "0";
+    [Parameter]
+    public string Content { get; set; }
+    [Parameter]
+    public string FontSize { get; set; } = "1rem";
+    [Parameter]
+    public string Color { get; set; } = "#000";
+    [Parameter, Required]
+    public Guid Guid { get; set; }
+
+    private string _dominantBaseline = "middle";
+    private VerticalPositions _verticalPosition = VerticalPositions.Middle;
+
+    [Parameter]
+    public VerticalPositions VerticalPosition
+    {
+        get { return _verticalPosition; }
+        set
+        {
+            if (_verticalPosition != value)
+            {
+                _verticalPosition = value;
+                _dominantBaseline = value switch
+                {
+                    VerticalPositions.Top => "auto",
+                    VerticalPositions.Middle => "middle",
+                    VerticalPositions.Bottom => "hanging",
+                    _ => "middle"
+                };
+                StateHasChanged();
+            };
+        }
+    }
+
+    private string _textAnchor = "middle";
+    private HorizontalPositions _horizontalPosition = HorizontalPositions.Middle;
+
+    [Parameter]
+    public HorizontalPositions HorizontalPosition
+    {
+        get { return _horizontalPosition; }
+        set
+        {
+            if (_horizontalPosition != value)
+            {
+                _horizontalPosition = value;
+                _textAnchor = value switch
+                {
+                    HorizontalPositions.Left => "end",
+                    HorizontalPositions.Middle => "middle",
+                    HorizontalPositions.Right => "start",
+                    _ => "middle"
+                };
+                StateHasChanged();
+            };
+        }
+    }
+
+
+}
+
+

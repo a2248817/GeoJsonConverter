@@ -1,12 +1,35 @@
-﻿@inherits LayoutComponentBase
+﻿@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@inherits LayoutComponentBase
 
 <PageTitle>GeoJsonConverter</PageTitle>
 
-<div class="page">
-    <div class="sidebar px-4">
-        <NavMenu />
+<div class="vh-100">
+    <div style="height: 5%;">
+        <SfAppBar ColorMode="AppBarColor.Primary">
+
+            <a href="/">
+                <img src="/resources/images/favicon.png" />
+            </a>
+
+            <AppBarSpacer></AppBarSpacer>
+            <SfMenu TValue="MenuItem" CssClass="d-flex justify-content-around e-inherit">
+                <MenuItems>
+                    <MenuItem Text="SfMaps" Url="/"></MenuItem>
+                    <MenuItem Text="SvgEditor" Url="/TestRoute/BlazorCanvas"></MenuItem>
+                </MenuItems>
+            </SfMenu>
+
+            <AppBarSpacer></AppBarSpacer>
+            <SfMenu TValue="MenuItem" CssClass="d-flex justify-content-around e-inherit">
+                <MenuItems>
+                    <MenuItem Text="Sign in" Url=""></MenuItem>
+                    <MenuItem Text="Register" Url=""></MenuItem>
+                </MenuItems>
+            </SfMenu>
+        </SfAppBar>
     </div>
-    <div class="container-fluid">
+    <div style="height: 95%;">
         @Body
     </div>
 </div>

@@ -1,0 +1,49 @@
+﻿@switch (ElementType)
+{
+    case SvgElementType.Circle:
+        <circle onclick=@((MouseEventArgs args) => OnClick(this, args))></circle>
+        break;
+    case SvgElementType.Polyline:
+        <polyline onclick=@((MouseEventArgs args) => OnClick(this, args))></polyline>
+        break;
+    case SvgElementType.Polygon:
+        <polygon onclick=@((MouseEventArgs args) => OnClick(this, args))></polygon>
+        break;
+    case SvgElementType.Image:
+        <image onclick=@((MouseEventArgs args) => OnClick(this, args))></image>
+        break;
+    default:
+        break;
+}
+
+<circle cx="10%" cy="10%" r="10%" fill="red"></circle>
+<polygon  points="40 50 50 50 50 60 40 60 40 50" fill="red"></polygon>
+
+@code {
+    [Parameter]
+    public SvgElementType ElementType { get; set; } = SvgElementType.Null;
+
+    public delegate void OnClickHnadler(object sender, MouseEventArgs args);
+    [Parameter]
+    public OnClickHnadler OnClick { get; set; }
+
+    public Dictionary<string, string> Attributes = new();
+}
+
+
+
+
+
+
+
+@code {
+    public enum SvgElementType
+    {
+        Circle,
+        Polyline,
+        Polygon,
+        Text,
+        Image,
+        Null
+    }
+}

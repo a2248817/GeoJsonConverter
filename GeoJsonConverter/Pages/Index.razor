@@ -17,16 +17,6 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div>
-
-            <SfAppBar ColorMode="AppBarColor.Primary">
-                <span class="regular">Blazor AppBar</span>
-                <AppBarSpacer></AppBarSpacer>
-                <span class="regular">Blazor AppBar</span>
-            </SfAppBar>
-        </div>
-    </div>
-    <div class="row">
 
 
         <div class="col-10 my-2" id="SfMaps">
@@ -85,12 +75,12 @@
             <SfNumericTextBox @bind-Value="@X"
                               Placeholder="X"
                               Min="1"
-                              Max="20"
+                              Max="100"
                               TValue="int"></SfNumericTextBox>
             <SfNumericTextBox @bind-Value="@Y"
                               Placeholder="Y"
                               Min="1"
-                              Max="20"
+                              Max="100"
                               TValue="int"></SfNumericTextBox>
 
             <h1>X: @X, Y: @Y</h1>
@@ -136,8 +126,8 @@
     public int X { get; set; }
     public int Y { get; set; }
 
-    private SfMaps? SfMaps { get; set; }
-    private MapsLayer<string>? MapsLayer { get; set; }
+    private SfMaps SfMaps { get; set; }
+    private MapsLayer<string> MapsLayer { get; set; }
 
     public List<Feature> SelectedPoints { get; set; } = new();
     public List<SelectedPointModel> SelectedPointModels { get; set; } = new();

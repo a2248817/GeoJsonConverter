@@ -1,0 +1,56 @@
+﻿<circle cx="@($"{X}%")"
+        cy="@($"{Y}%")"
+        r="@($"{Radius}%")"
+        fill="@Fill"
+        stroke="@Stroke"
+        stroke-width="@($"{StrokeWidth}%")"
+        onclick="@((MouseEventArgs args) => OnClick(this, args))"
+        guid="@Guid"
+         />
+
+
+@if (string.IsNullOrEmpty(Text) == false)
+{
+    <GeoJsonConverter.Components.Text X="@($"{X}%")"
+                                      Y="@($"{Y}%")"
+                                      Guid="@Guid"
+                                      Content="@Text"></GeoJsonConverter.Components.Text>
+}
+
+@code {
+    [Parameter]
+    public double X { get; set; }
+    [Parameter]
+    public double Y { get; set; }
+    [Parameter]
+    public double Radius { get; set; } = 0.5;
+    [Parameter]
+    public string Fill { get; set; } = "#F00";
+    [Parameter]
+    public string SelectedFill { get; set; } = "#0F0";
+    [Parameter]
+    public string Stroke { get; set; } = "#000";
+    [Parameter]
+    public double StrokeWidth { get; set; } = 0.1;
+
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public Guid Guid { get; set; } = Guid.NewGuid();
+
+
+    [Parameter]
+    public OnClickHandler OnClick{ get; set; }
+
+    public delegate void OnClickHandler(object sender, MouseEventArgs e);
+
+
+    public void Select()
+    {
+        var previousFill = Fill;
+        Fill = SelectedFill;
+        SelectedFill = previousFill;
+    }
+
+}
